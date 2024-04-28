@@ -1,0 +1,22 @@
+{
+  "name": "django-soft-9dd8f378-d509-4860-834f-d3652f83d9de",
+  "version": "1.0.0",
+  "description": "Starter built with [Django App Generator](https://app-generator.dev/django/) - Actively supported by [AppSeed](https://appseed.us/) via `Email` and `Discord`.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@amcharts/amcharts5": "^5.9.4",
+    "@amcharts/amcharts5-fonts": "^5.0.1",
+    "@amcharts/amcharts5-geodata": "^5.1.2",
+    "@mui/material": "^5.15.15",
+    "@mui/x-data-grid": "^7.3.1",
+    "bootstrap": "^5.3.3",
+    "bootstrap-icons": "^1.11.3",
+    "bootstrap-table": "^1.22.4"
+  }
+}
