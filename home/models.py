@@ -3,7 +3,7 @@ from django.conf import settings
 from django.contrib.auth.models import AbstractUser
 from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
-from django.contrib.postgres.fields import JSONField
+from django.db.models import JSONField
 from django.utils.translation import gettext_lazy as _
 
 # Create your models here.
@@ -43,7 +43,8 @@ class Location(models.Model):
     delivery_point = models.CharField(max_length=100)
     #__Location_FIELDS__END
 
-    contacts = models.ManyToManyField('Contact', related_name='locations')
+    contacts = models.ManyToManyField('Contact', related_name='locations_contacts')
+
 
 
     class Meta:
@@ -52,8 +53,6 @@ class Location(models.Model):
 
 
 class Incident(models.Model):
-
-    #__Incident_FIELDS__START
     id = models.CharField(max_length=255, primary_key=True)
     agency_id = models.CharField(max_length=100)
     common_place_name = models.CharField(max_length=255, blank=True, null=True)
@@ -82,16 +81,12 @@ class Incident(models.Model):
     category = models.CharField(max_length=100, blank=True, null=True)
     timezone = models.CharField(max_length=50)
     units = JSONField() 
-    #__Incident_FIELDS__END
-    
-    #__Incident_Relationships_FIELDS__START
-    locations = models.ManyToManyField('Location', related_name='incidents')
-    contacts = models.ManyToManyField('Contact', related_name='incidents')
-    #__Incident_Relationships_FIELDS__END
+    locations = models.ManyToManyField('Location', related_name='incident_locations')
+    contacts = models.ManyToManyField('Contact', related_name='incident_contacts')
 
     class Meta:
-        verbose_name        = _("Incident")
-        verbose_name_plural = _("Incident")
+        verbose_name = _("Incident")
+        verbose_name_plural = _("Incidents")
 
 
 class CustomUser(AbstractUser):
@@ -112,7 +107,23 @@ class CustomUser(AbstractUser):
     license = models.CharField(max_length=50, blank=True, null=True)
     license_state = models.CharField(max_length=50, blank=True, null=True)
     #__User_FIELDS__END
-
+    groups = models.ManyToManyField(
+            'auth.Group',
+            verbose_name='groups',
+            blank=True,
+            help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
+            related_name="customuser_groups",
+            related_query_name="user",
+        )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        verbose_name='user permissions',
+        blank=True,
+        help_text='Specific permissions for this user.',
+        related_name="customuser_permissions",
+        related_query_name="user",
+    )
+    
     class Meta:
         verbose_name        = _("User")
         verbose_name_plural = _("User")
@@ -145,8 +156,6 @@ class Company(models.Model):
 
 
 class Contact(models.Model):
-
-    #__Contact_FIELDS__
     id = models.CharField(max_length=255, primary_key=True)
     name = models.CharField(max_length=255, blank=True, null=True)
     firstname = models.CharField(max_length=255, blank=True, null=True)
@@ -163,19 +172,14 @@ class Contact(models.Model):
     state_code = models.CharField(max_length=255, blank=True, null=True)
     country_code = models.CharField(max_length=255, blank=True, null=True)
     lead_status = models.CharField(max_length=255, blank=True, null=True)
-    location = models.ForeignKey(Location, on_delete=models.CASCADE, related_name='contacts')
     emails = JSONField(blank=True, null=True)
-    phones = JSONField(blank=True, null=True) 
-    #__Contact_FIELDS__END
-    
-    #__Contact__Relationship_FIELDS__START
-    locations = models.ManyToManyField('Location', related_name='contacts')
-    incidents = models.ManyToManyField('Incident', related_name='contacts')
-    #__Contact__Relationship_FIELDS__END    
+    phones = JSONField(blank=True, null=True)
+    locations = models.ManyToManyField('Location', related_name='contact_additional_locations')
+    incidents = models.ManyToManyField('Incident', related_name='related_contacts')
 
     class Meta:
-        verbose_name        = _("Contact")
-        verbose_name_plural = _("Contact")
+        verbose_name = _("Contact")
+        verbose_name_plural = _("Contacts")
 
 
 class Deal(models.Model):
